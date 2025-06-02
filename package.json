@@ -4,7 +4,6 @@
   "description": "",
   "author": "",
   "private": true,
-  "main": "dist/src/main.js",
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
@@ -18,9 +17,7 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json",
-    "deploy": "npm run build && firebase deploy --only functions",
-    "test:functions":"npm run build && firebase emulators:start --only functions"
+    "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
