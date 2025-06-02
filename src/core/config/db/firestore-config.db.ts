@@ -13,7 +13,6 @@ export class FirestoreConfigDbModule {
         {
           provide: FIRESTORE_CONFIG,
           useFactory: (configService: ConfigService) => {
-            Logger.log('Initializing Firestore...');
             let serviceAccountKey = configService.get<string>('FIREBASE_SERVICE_ACCOUNT');
             if (!serviceAccountKey) {
               throw new InvalidFirebaseServiceAccountException();
