@@ -1,0 +1,12 @@
+{
+  "USER": {
+    "NOT_FOUND": "No user was found with the provided information.",
+    "EMAIL_ALREADY_EXISTS": "A user with this email address already exists."
+  },
+  "AUTH": {
+    "INVALID_CREDENTIALS": "The email or password entered is incorrect."
+  },
+  "TASK": {
+    "NOT_FOUND": "No task was found with the provided information."
+  }
+}
