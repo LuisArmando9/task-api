@@ -15,6 +15,7 @@ import {
 import { TaskModel } from 'src/task/core/domain/models/task-model';
 
 export class CreateTaskDto {
+
   @ApiProperty({
     example: 'Implement authentication',
     description: 'Title of the task',
@@ -32,12 +33,10 @@ export class CreateTaskDto {
   description?: string;
 
   @ApiProperty({
-    enum: TaskStatus,
-    example: TaskStatus.CANCELLED,
-    description: 'Current status of the task',
+    example: true
   })
-  @IsEnum(TaskStatus)
-  status: TaskStatus;
+  @IsBoolean()
+  isPending: Boolean;
 
   @ApiProperty({
     enum: TaskPriority,
@@ -54,16 +53,6 @@ export class CreateTaskDto {
   @IsOptional()
   @IsDateString()
   dueDate?: string;
-
-  @ApiPropertyOptional({
-    example: ['backend', 'auth'],
-    description: 'Tags associated with the task',
-    type: [String],
-  })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  tags?: string[];
 
   @ApiPropertyOptional({
     example: false,
@@ -89,10 +78,12 @@ export class UpdateTaskDto implements Partial<Omit<CreateTaskDto, 'toDomain'>> {
   @IsString()
   description?: string;
 
-  @ApiPropertyOptional({ enum: TaskStatus, example: TaskStatus.IN_PROGRESS })
+  @ApiProperty({
+    example: true
+  })
+  @IsBoolean()
   @IsOptional()
-  @IsEnum(TaskStatus)
-  status?: TaskStatus;
+  isPending?: Boolean;
 
   @ApiPropertyOptional({ enum: TaskPriority, example: TaskPriority.MEDIUM })
   @IsOptional()
@@ -104,14 +95,6 @@ export class UpdateTaskDto implements Partial<Omit<CreateTaskDto, 'toDomain'>> {
   @IsDateString()
   dueDate?: string;
 
-  @ApiPropertyOptional({
-    example: ['swagger', 'documentation'],
-    type: [String],
-  })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  tags?: string[];
 
   @ApiPropertyOptional({ example: true })
   @IsOptional()

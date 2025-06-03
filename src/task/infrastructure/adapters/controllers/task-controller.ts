@@ -1,5 +1,5 @@
-import { BadRequestException, Body, Controller, Delete, Get, Logger, Param, Post, Put, Req, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { BadRequestException, Body, Controller, Delete, Get, Logger, Param, Post, Put, Query, Req, UseGuards } from "@nestjs/common";
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiQuery, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CreateTaskDto, UpdateTaskDto, TaskDto } from "../dtos/task-dto";
 import { CreateTaskUsecase } from "src/task/core/domain/usecase/create-task-usecase";
 import { DeleteTaskUsecase } from "src/task/core/domain/usecase/delete-task-usecase";
@@ -7,6 +7,8 @@ import { GetTaskUsecase } from "src/task/core/domain/usecase/get-task-usecase";
 import { UpdateTaskUsecase } from "src/task/core/domain/usecase/update-task-usecase";
 import { JwtAuthGuard } from "src/auth/infrastructure/adapters/guards/jwt.guard";
 import { Request } from "express";
+import { GetTasksQueryDto } from "../dtos/task-query.dto";
+import { PaginatedTasksDto } from "../dtos/paginated-tasks.dto";
 
 @Controller('api/v1/tasks')
 @ApiTags('tasks')
@@ -16,6 +18,15 @@ export class TaskController {
         private readonly updateTaskUsecase: UpdateTaskUsecase,
         private readonly deleteTaskUsecase: DeleteTaskUsecase,
     ) {}
+
+    @Get('list')
+    @ApiOperation({ summary: 'Get tasks with pagination' })
+    @ApiResponse({ status: 200, description: 'Tasks retrieved successfully', type: PaginatedTasksDto })
+    @ApiBearerAuth()
+    getTask(@Query() query: GetTasksQueryDto){
+        const { limit, cursor, ...filters } = query;
+        return this.getTaskUsecase.get({limit, cursor: cursor ?? null}, filters as any);
+    }
 
     @Post()
     @ApiOperation({ summary: 'Create a new task' })

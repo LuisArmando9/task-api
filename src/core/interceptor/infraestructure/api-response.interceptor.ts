@@ -18,7 +18,7 @@ export class ResponseInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       map((data): ApiResponse<unknown> => ({
-        status: HttpStatus.FAILED,
+        status: HttpStatus.SUCCESS,
         code: HttpCode.OK,
         path,
         method:  request.method,

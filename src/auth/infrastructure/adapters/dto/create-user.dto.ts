@@ -12,7 +12,7 @@ export class CreateUserDTO {
   name!: string;
 
   @ApiProperty({
-    example: 'juan@example.com',
+    example: 'luis@example.com',
     description: 'Correo electrónico válido',
   })
   @IsEmail({}, { message: 'El correo no es válido' })

@@ -37,6 +37,7 @@ async function bootstrap() {
       forbidNonWhitelisted: true,
     }),
   );
+  app.enableCors();
 
   setupSwagger(app);
 

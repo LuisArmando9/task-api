@@ -10,31 +10,113 @@ A RESTful API built with NestJS for managing tasks with user authentication.
 - Task Filtering and Sorting
 - Swagger Documentation
 - Firebase Integration
+- CORS Enabled
+- Validation Pipes
+- Global Response Interceptor
+- Error Handling Filter
+
+## Architecture
+
+### Clean Architecture
+
+This project follows Clean Architecture principles, separating the code into layers:
+
+```
+src/
+├── core/                          # Core functionality
+│   ├── filters/                   # Global error filters
+│   └── interceptors/             # Response interceptors
+│
+├── user/                         # User module
+│   ├── core/                     # Domain layer
+│   │   ├── domain/              
+│   │   │   ├── models/          # Domain models
+│   │   │   └── interfaces/      # Domain interfaces
+│   │   └── use-cases/          # Application use cases
+│   ├── infrastructure/          # Infrastructure layer
+│   │   ├── adapters/           # External adapters
+│   │   └── repositories/       # Data repositories
+│   └── application/            # Application layer
+│       ├── controllers/        # HTTP controllers
+│       └── services/          # Application services
+│
+├── task/                        # Task module
+│   ├── core/                   # Domain layer
+│   │   ├── domain/
+│   │   │   ├── models/        # Task domain models
+│   │   │   ├── enums/         # Task enums
+│   │   │   └── interfaces/    # Task interfaces
+│   │   └── use-cases/        # Task use cases
+│   ├── infrastructure/        # Infrastructure layer
+│   │   ├── adapters/         # External adapters
+│   │   │   └── dtos/        # Data transfer objects
+│   │   └── repositories/     # Task repositories
+│   └── application/          # Application layer
+│       ├── controllers/      # Task controllers
+│       └── services/        # Task services
+│
+└── main.ts                    # Application entry point
+```
+
+### Design Patterns
+
+- Repository Pattern
+- Dependency Injection
+- DTO Pattern
+- Adapter Pattern
+- Factory Pattern
+- Singleton Pattern (for services)
 
 ## Tech Stack
 
-- NestJS
+- NestJS (Node.js framework)
 - TypeScript
 - Express
 - Firebase Functions
 - Swagger/OpenAPI
-- Class Validator
+- Class Validator & Transformer
 - JWT Authentication
 
-## Project Structure
+## API Documentation (Swagger)
 
+### Swagger Configuration
+
+The API documentation is automatically generated using Swagger/OpenAPI. Access it at:
 ```
-src/
-├── core/                 # Core functionality (filters, interceptors)
-├── user/                 # User module
-│   ├── core/            # User domain logic
-│   ├── infrastructure/  # User implementations
-│   └── application/     # User use cases
-├── task/                # Task module
-│   ├── core/           # Task domain logic
-│   ├── infrastructure/ # Task implementations
-│   └── application/    # Task use cases
-└── main.ts             # Application entry point
+http://localhost:3000/api/docs
+```
+
+### Available DTOs
+
+#### Task DTOs
+
+```typescript
+// CreateTaskDto
+{
+  title: string;          // Example: "Implement authentication"
+  description?: string;   // Example: "Use JWT for user login sessions"
+  isPending: boolean;     // Example: true
+  priority: TaskPriority; // Example: "HIGH"
+  dueDate?: string;      // Example: "2025-06-30T23:59:59Z"
+  isArchived?: boolean;  // Example: false
+}
+
+// UpdateTaskDto
+{
+  title?: string;         // Example: "Update Swagger docs"
+  description?: string;   // Example: "Add examples to DTOs"
+  isPending?: boolean;    // Example: true
+  priority?: TaskPriority;// Example: "MEDIUM"
+  dueDate?: string;      // Example: "2025-07-15T12:00:00Z"
+  isArchived?: boolean;  // Example: true
+}
+
+// TaskDto
+{
+  id: string;            // UUID Example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
+  creatorId: string;     // UUID Example: "9b2d32c7-a843-4a3b-bbbb-0a67adfd93ec"
+  // ... other properties from CreateTaskDto
+}
 ```
 
 ## Installation
@@ -55,6 +137,13 @@ npm install
 cp .env.example .env
 ```
 
+Required environment variables:
+```env
+PORT=3000
+JWT_SECRET=your_jwt_secret
+FIREBASE_PROJECT_ID=your_firebase_project_id
+```
+
 ## Running the Application
 
 ### Development
@@ -68,69 +157,56 @@ npm run build
 npm run start:prod
 ```
 
-## API Documentation
-
-The API documentation is available through Swagger UI at:
-```
-http://localhost:3000/api/docs
-```
-
-## Available Endpoints
+## API Endpoints
 
 ### User Endpoints
-- POST /api/users/register - Register new user
-- POST /api/users/login - User login
-- GET /api/users/profile - Get user profile
+```
+POST /api/users/register - Register new user
+POST /api/users/login    - User login
+GET  /api/users/profile - Get user profile
+```
 
 ### Task Endpoints
-- GET /api/tasks - List all tasks
-- POST /api/tasks - Create new task
-- GET /api/tasks/:id - Get task details
-- PATCH /api/tasks/:id - Update task
-- DELETE /api/tasks/:id - Delete task
+```
+GET    /api/tasks        - List all tasks
+POST   /api/tasks        - Create new task
+GET    /api/tasks/:id    - Get task details
+PATCH  /api/tasks/:id    - Update task
+DELETE /api/tasks/:id    - Delete task
+```
 
-## Controllers
+## Security
 
-### UserController
-- Handles user registration and authentication
-- Manages user profiles
-- JWT token generation and validation
+- JWT Authentication
+- Request Validation
+- CORS Protection
+- Input Sanitization
+- Error Handling
 
-### TaskController
-- Manages CRUD operations for tasks
-- Handles task filtering and sorting
-- Implements task status updates
+## Error Handling
 
-## Services
+The API uses a global filter (`ApiFailedResponseFilter`) to handle exceptions and return standardized error responses:
 
-### UserService
-- User creation and management
-- Password hashing and verification
-- Profile management
+```typescript
+{
+  statusCode: number;
+  message: string;
+  error: string;
+  timestamp: string;
+}
+```
 
-### TaskService
-- Task creation and management
-- Task status updates
-- Task filtering and querying
+## Response Interceptor
 
-## Data Transfer Objects (DTOs)
+All successful responses are wrapped in a standard format using `ResponseInterceptor`:
 
-### User DTOs
-- CreateUserDto
-- UpdateUserDto
-- LoginUserDto
-
-### Task DTOs
-- CreateTaskDto
-- UpdateTaskDto
-- TaskDto
-
-## Environment Variables
-
-```env
-PORT=3000
-JWT_SECRET=your_jwt_secret
-FIREBASE_PROJECT_ID=your_firebase_project_id
+```typescript
+{
+  statusCode: number;
+  data: T;
+  message: string;
+  timestamp: string;
+}
 ```
 
 ## Contributing

@@ -1,6 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { firestore } from 'firebase-admin';
+import {
+  CursorPaginationParams,
+  CursorPagination,
+} from 'src/core/common/models/cursor.pagination';
 import { InjectDatabase } from 'src/core/config/db/firestore-config.db';
+import { TaskFilters } from 'src/task/core/domain/models/task-filter.model';
 import { TaskModel } from 'src/task/core/domain/models/task-model';
 import { TaskRepository } from 'src/task/core/domain/repositories/task.repository';
 import { TaskMapper } from 'src/task/infrastructure/mappers/task-mapper';
@@ -15,6 +20,7 @@ export class TaskRepositoryImpl implements TaskRepository {
   ) {
     this.tasksRef = this.database.collection(this.collection);
   }
+
   async create(task: TaskModel): Promise<TaskModel> {
     task.id = v4();
     const taskData = task.toJson();
@@ -36,14 +42,17 @@ export class TaskRepositoryImpl implements TaskRepository {
   async update(id: string, task: TaskModel): Promise<TaskModel | null> {
     const snapshot = await this.tasksRef.where('id', '==', id).limit(1).get();
     if (snapshot.empty) return null;
+    Logger.log('task', task);
     const [doc] = snapshot.docs;
-    const updatedData = {
-      ...task.toJson(),
-      updatedAt: new Date().toISOString(),
-    };
+    const taskData = task.toJson();
+    Object.keys(taskData).forEach((key) => {
+      if (taskData[key] == null) {
+        delete taskData[key];
+      }
+    });
+    const updatedData = {...doc.data(), ...taskData};
 
     await doc.ref.update(updatedData);
-
     return TaskMapper.toDomain(updatedData);
   }
 
@@ -54,5 +63,42 @@ export class TaskRepositoryImpl implements TaskRepository {
 
     const [doc] = snapshot.docs;
     await doc.ref.delete();
+  }
+
+  async getTasks(
+    params: CursorPaginationParams,
+    filters?: TaskFilters,
+  ): Promise<CursorPagination<TaskModel>> {
+    const { limit, cursor } = params;
+    let query = this.tasksRef.orderBy('createdAt').limit(limit);
+
+    if (cursor) {
+      const lastDocSnapshot = await this.tasksRef.doc(cursor.toString()).get();
+
+      if (lastDocSnapshot.exists) {
+        query = query.startAfter(lastDocSnapshot);
+      }
+    }
+
+    if (filters) {
+      Object.keys(filters).forEach((key) => {
+        if (filters[key]  ) {
+        query = query.where(key, '==', filters[key]);
+        }
+      });
+    }
+   
+    const snapshot = await query.get();
+
+    const items = snapshot.docs.map(
+      (doc): TaskModel => TaskMapper.toDomain(doc.data()),
+    );
+
+    const lastVisible = snapshot.docs[snapshot.docs.length - 1];
+
+    return {
+      items,
+      nextCursor: lastVisible?.id || null,
+    };
   }
 }

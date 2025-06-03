@@ -4,11 +4,10 @@ export class TaskModel {
   id: string;
   title: string;
   description?: string;
-  status: TaskStatus;
+  isPending: boolean;
   priority: TaskPriority;
   dueDate?: string;
   userId: string;
-  tags?: string[];
   isArchived: boolean;
   createdAt: Date;
 
@@ -16,7 +15,7 @@ export class TaskModel {
     return {
       id: this.id,
       title: this.title,
-      status: this.status,
+      isPending: this.isPending,
       priority: this.priority,
       userId: this.userId,
       isArchived: this.isArchived,
