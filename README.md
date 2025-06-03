@@ -2,6 +2,12 @@
 
 A RESTful API built with NestJS for managing tasks with user authentication.
 
+## Live API Documentation
+
+The API is deployed and accessible at:
+- Live Swagger Documentation: [https://task-api-bemoba.fly.dev/api/docs](https://task-api-bemoba.fly.dev/api/docs)
+- Base API URL: `https://task-api-bemoba.fly.dev`
+
 ## Features
 
 - User Management (Authentication & Authorization)
@@ -79,43 +85,85 @@ src/
 
 ## API Documentation (Swagger)
 
-### Swagger Configuration
+### Swagger Endpoints
 
-The API documentation is automatically generated using Swagger/OpenAPI. Access it at:
+You can access the Swagger documentation at:
+- Development: `http://localhost:3000/api/docs`
+- Production: [https://task-api-bemoba.fly.dev/api/docs](https://task-api-bemoba.fly.dev/api/docs)
+
+### Authentication
+
+The API uses Bearer token authentication. To access protected endpoints:
+1. First, register or login to obtain a JWT token
+2. Click the "Authorize" button in Swagger UI
+3. Enter your token in the format: `Bearer your_jwt_token`
+
+### Available Endpoints
+
+#### Authentication
 ```
-http://localhost:3000/api/docs
+POST /api/auth/register - Register new user
+POST /api/auth/login    - Login user
 ```
 
-### Available DTOs
+#### Users
+```
+GET    /api/users/profile   - Get current user profile
+PATCH  /api/users/profile   - Update user profile
+DELETE /api/users/profile   - Delete user account
+```
 
-#### Task DTOs
+#### Tasks
+```
+GET    /api/tasks          - List all tasks
+POST   /api/tasks          - Create new task
+GET    /api/tasks/:id      - Get task details
+PATCH  /api/tasks/:id      - Update task
+DELETE /api/tasks/:id      - Delete task
+```
 
-```typescript
-// CreateTaskDto
+### Request/Response Examples
+
+#### Create Task Request
+```json
 {
-  title: string;          // Example: "Implement authentication"
-  description?: string;   // Example: "Use JWT for user login sessions"
-  isPending: boolean;     // Example: true
-  priority: TaskPriority; // Example: "HIGH"
-  dueDate?: string;      // Example: "2025-06-30T23:59:59Z"
-  isArchived?: boolean;  // Example: false
+  "title": "Implement authentication",
+  "description": "Use JWT for user login sessions",
+  "isPending": true,
+  "priority": "HIGH",
+  "dueDate": "2025-06-30T23:59:59Z",
+  "isArchived": false
 }
+```
 
-// UpdateTaskDto
+#### Task Response
+```json
 {
-  title?: string;         // Example: "Update Swagger docs"
-  description?: string;   // Example: "Add examples to DTOs"
-  isPending?: boolean;    // Example: true
-  priority?: TaskPriority;// Example: "MEDIUM"
-  dueDate?: string;      // Example: "2025-07-15T12:00:00Z"
-  isArchived?: boolean;  // Example: true
+  "statusCode": 200,
+  "data": {
+    "id": "d290f1ee-6c54-4b01-90e6-d701748f0851",
+    "creatorId": "9b2d32c7-a843-4a3b-bbbb-0a67adfd93ec",
+    "title": "Implement authentication",
+    "description": "Use JWT for user login sessions",
+    "isPending": true,
+    "priority": "HIGH",
+    "dueDate": "2025-06-30T23:59:59Z",
+    "isArchived": false,
+    "createdAt": "2024-03-19T15:32:10.123Z",
+    "updatedAt": "2024-03-19T15:32:10.123Z"
+  },
+  "message": "Task created successfully",
+  "timestamp": "2024-03-19T15:32:10.123Z"
 }
+```
 
-// TaskDto
+#### Error Response
+```json
 {
-  id: string;            // UUID Example: "d290f1ee-6c54-4b01-90e6-d701748f0851"
-  creatorId: string;     // UUID Example: "9b2d32c7-a843-4a3b-bbbb-0a67adfd93ec"
-  // ... other properties from CreateTaskDto
+  "statusCode": 400,
+  "message": "Invalid input data",
+  "error": "Bad Request",
+  "timestamp": "2024-03-19T15:32:10.123Z"
 }
 ```
 
