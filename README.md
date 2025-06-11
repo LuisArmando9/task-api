@@ -5,8 +5,8 @@ Una API RESTful construida con NestJS para la gestión de tareas con autenticaci
 ## Documentación API en Vivo
 
 La API está desplegada y accesible en:
-- Documentación Swagger en vivo: [https://task-api-bemoba.fly.dev/api/docs](https://task-api-bemoba.fly.dev/api/docs)
-- URL base de la API: `https://task-api-bemoba.fly.dev`
+- Documentación Swagger en vivo: [https://task-api.fly.dev/api/docs](https://task-api.fly.dev/api/docs)
+- URL base de la API: `https://task-api.fly.dev/api`
 
 ## Características
 
@@ -89,7 +89,7 @@ src/
 
 Puedes acceder a la documentación Swagger en:
 - Desarrollo: `http://localhost:3000/api/docs`
-- Producción: [https://task-api-bemoba.fly.dev/api/docs](https://task-api-bemoba.fly.dev/api/docs)
+- Producción: [https://task-api.fly.dev/api/docs](https://task-api.fly.dev/api/docs)
 
 ### Autenticación
 
